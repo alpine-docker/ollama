@@ -30,8 +30,7 @@ jobs:
           # Build the Docker image
           mkdir -p amd64 arm64
           for arch in amd64 arm64; do
-            docker rm -f ollama
-            docker run -d --platform linux/${arch} ollama/ollama
+            docker run -d --platform linux/${arch} --name ollama ollama/ollama
             docker cp ollama:/usr/lib/ollama/runners/cpu ./${arch}/cpu
             docker cp ollama:/usr/lib/ollama/runners/cpu_avx ./${arch}/cpu_avx || echo "ok"
             docker cp ollama:/usr/lib/ollama/runners/cpu_avx2 ./${arch}/cpu_avx2 || echo "ok"
