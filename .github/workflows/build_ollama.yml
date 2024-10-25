@@ -72,7 +72,6 @@ jobs:
         id: build-and-push
         uses: docker/build-push-action@v6
         with:
-          context: .  # Adjust if needed
           platforms: linux/amd64,linux/arm64
           sbom: ${{ github.event_name != 'pull_request' }}
           provenance: ${{ github.event_name != 'pull_request' }}
