@@ -32,12 +32,13 @@ jobs:
           mkdir -p amd64 arm64
           for arch in amd64 arm64; do
             docker run -d --platform linux/${arch} --name ollama ollama/ollama
+            docker cp ollama:/usr/lib/ollama/libggml-base.so ./${arch}/libggml-base.so || echo "copy base: ok"
             if [ "$arch" == "amd64" ]; then
-              docker exec ollama bash -c "mkdir -p /extract; cp -f /usr/lib/ollama/libggml-cpu-* /extract"
-              docker cp ollama:/extract/. ./${arch}/ || echo "ok"
+              docker exec ollama bash -c "mkdir -p /extract; cp -f /usr/lib/ollama/libggml-cpu* /extract"
+              docker cp ollama:/extract/. ./${arch}/ || echo "copy $arch cpu files: ok"
+            else
+              docker cp ollama:/usr/lib/ollama/libggml-cpu.so ./${arch}/libggml-cpu.so || echo "copy $arch cpu file(s): ok"
             fi
-            docker cp ollama:/usr/lib/ollama/libggml-base.so ./${arch}/libggml-base.so || echo "ok"
-            dokcer cp ollama:/user/lib/ollama/libggml-cpu.so ./${arch}/libggml-cpu.so || echo "ok"
             # docker cp ollama:/usr/lib/ollama/runners/cpu ./${arch}/cpu
             # docker cp ollama:/usr/lib/ollama/runners/cpu_avx ./${arch}/cpu_avx || echo "ok"
             # docker cp ollama:/usr/lib/ollama/runners/cpu_avx2 ./${arch}/cpu_avx2 || echo "ok"
