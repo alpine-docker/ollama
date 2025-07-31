@@ -1,11 +1,12 @@
-FROM ollama/ollama AS ollama
+FROM docker.io/ollama/ollama:latest AS ollama
 
 FROM cgr.dev/chainguard/wolfi-base
 
 RUN apk add --no-cache libstdc++
 
 COPY --from=ollama /usr/bin/ollama /usr/bin/ollama
-COPY --from=ollama /usr/lib/ollama/runners/cpu /usr/lib/ollama/runners/cpu
+COPY --from=ollama /usr/lib/ollama/libggml-cpu-* /usr/lib/ollama/
+COPY --from=ollama /usr/lib/ollama/libggml-base.so /usr/lib/ollama/libggml-base.so
 
 # In arm64 ollama/ollama image, there is no avx libraries and seems they are not must-have (#2903, #3891)
 # COPY --from=ollama /usr/lib/ollama/runners/cpu_avx /usr/lib/ollama/runners/cpu_avx
