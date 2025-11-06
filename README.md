@@ -29,7 +29,7 @@ docker pull alpine/ollama
 
 ```
 docker rm -f ollama
-docker run -d -p 11434:11434 -v ~/.ollama/root/.ollama --name ollama alpine/ollama
+docker run -d -p 11434:11434 -v ~/.ollama:/root/.ollama --name ollama alpine/ollama
 ```
 
 * Download the models, for example, `llama3.2`, only run once. It will save the model locally, you can re-use it later.
