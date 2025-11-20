@@ -24,6 +24,7 @@ target "ollama-multiarch" {
   inherits = ["docker-metadata-action"]
   dockerfile = "Dockerfile"
   platforms = ["linux/amd64", "linux/arm64"]
+  tags = ["${REGISTRY}/${IMAGE_NAME}:${TAG}"]
   cache-from = ["type=gha"]
   cache-to = ["type=gha,mode=max"]
 }
