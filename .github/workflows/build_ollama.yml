@@ -25,29 +25,8 @@ jobs:
       pull-requests: write
 
     steps:
-      - name: Set up Docker
-        run: |
-          # Build the Docker image
-          mkdir -p amd64 arm64
-          for arch in amd64 arm64; do
-            docker run -d --platform linux/${arch} --name ollama ollama/ollama
-            docker cp ollama:/usr/lib/ollama/libggml-base.so ./${arch}/libggml-base.so || echo "copy base: ok"
-            if [ "$arch" == "amd64" ]; then
-              docker exec ollama bash -c "mkdir -p /extract; cp -f /usr/lib/ollama/libggml-cpu* /extract"
-              docker cp ollama:/extract/. ./${arch}/ || echo "copy $arch cpu files: ok"
-            else
-              docker cp ollama:/usr/lib/ollama/libggml-cpu.so ./${arch}/libggml-cpu.so || echo "copy $arch cpu file(s): ok"
-            fi
-            # docker cp ollama:/usr/lib/ollama/runners/cpu ./${arch}/cpu
-            # docker cp ollama:/usr/lib/ollama/runners/cpu_avx ./${arch}/cpu_avx || echo "ok"
-            # docker cp ollama:/usr/lib/ollama/runners/cpu_avx2 ./${arch}/cpu_avx2 || echo "ok"
-            docker rm -f ollama
-          done
-
-          echo "list amd64 files"
-          find amd64 -ls
-          echo "list arm64 files"
-          find arm64 -ls
+      - name: Checkout code
+        uses: actions/checkout@v4
 
       - name: Setup Docker buildx
         uses: docker/setup-buildx-action@v3
@@ -73,23 +52,17 @@ jobs:
             type=semver,pattern=v{{version}}
             type=sha,prefix=,suffix=,format=short
 
-      # Build and push Docker image with Buildx
+      # Build and push Docker image with Bake
       # (don't push on PR, load instead)
       - name: Build and push Docker image
         id: build-and-push
-        uses: docker/build-push-action@v6
+        uses: docker/bake-action@v5
         with:
-          platforms: linux/amd64,linux/arm64
-          sbom: ${{ github.event_name != 'pull_request' }}
-          provenance: ${{ github.event_name != 'pull_request' }}
+          targets: ollama-multiarch
           push: ${{ github.event_name != 'pull_request' }}
-          load: ${{ github.event_name == 'pull_request' }}
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-          cache-from: |
-            user/app:cache
-            type=local,src=.
-          cache-to: type=gha,mode=max
+          set: |
+            ollama-multiarch.tags=${{ steps.meta.outputs.tags }}
+            ollama-multiarch.labels=${{ steps.meta.outputs.labels }}
   
       # - name: Checkout code
       #   uses: actions/checkout@v2
