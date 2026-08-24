@@ -61,11 +61,11 @@ jobs:
         id: build-and-push
         uses: docker/bake-action@v5
         with:
+          files: |
+            ./docker-bake.hcl
+            ${{ steps.meta.outputs.bake-file }}
           targets: ollama-multiarch
           push: ${{ github.event_name != 'pull_request' }}
-          set: |
-            ollama-multiarch.tags=${{ steps.meta.outputs.tags }}
-            ollama-multiarch.labels=${{ steps.meta.outputs.labels }}
   
       # - name: Checkout code
       #   uses: actions/checkout@v2
