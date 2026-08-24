@@ -3,7 +3,8 @@ FROM docker.io/ollama/ollama:latest AS ollama
 # Drop GPU backends (each lives in its own subdir) in a separate stage so the
 # deleted bytes never end up in the final image's layers.
 FROM ollama AS ollama-cpu-only
-RUN rm -rf /usr/lib/ollama/cuda_v* /usr/lib/ollama/rocm_v* /usr/lib/ollama/vulkan /usr/lib/ollama/cuda_jetpack*
+RUN rm -rf /usr/lib/ollama/cuda_v* /usr/lib/ollama/rocm_v* /usr/lib/ollama/vulkan /usr/lib/ollama/cuda_jetpack* \ 
+      /usr/lib/ollama/mlx_cuda_v13 /usr/lib/ollama/cuda_v13
 
 FROM cgr.dev/chainguard/wolfi-base
 
